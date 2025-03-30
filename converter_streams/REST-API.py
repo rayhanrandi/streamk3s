@@ -64,19 +64,22 @@ def validate():
                 for pv in persistent_volumes:
                     Kubernetes.apply(pv)
                     # write the persistent volume file to yaml
-                    ff = open(dirpath + '/persistent_volume.yaml', 'w+')
+                    file_id = str(uuid.uuid4())
+                    ff = open(dirpath + '/persistent_volume'+ file_id+'.yaml', 'w+')
                     yaml.dump(pv, ff, allow_unicode=True, sort_keys=False)
                     ff.close()
             for configmap in confimap_files:
                 Kubernetes.apply(configmap)
                 # write the configmap file to yaml
-                ff = open(dirpath + '/configmap.yaml', 'w+')
+                file_id = str(uuid.uuid4())
+                ff = open(dirpath + '/configmap'+ file_id +'.yaml', 'w+')
                 yaml.dump(configmap, ff, allow_unicode=True, sort_keys=False)
                 ff.close()
             for deploy in deployment_files:
                 Kubernetes.apply(deploy)
                 # write the deployment file to yaml
-                ff = open(dirpath + '/deployment.yaml', 'w+')
+                file_id = str(uuid.uuid4())
+                ff = open(dirpath + '/deployment'+ file_id +'.yaml', 'w+')
                 yaml.dump(deploy, ff, allow_unicode=True, sort_keys=False)
                 ff.close()
                 os.system("kubectl wait --for condition=ready pods --all -n " + namespace + " --timeout=30s")
