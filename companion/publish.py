@@ -7,6 +7,8 @@ import pika
 import requests
 from requests.auth import HTTPBasicAuth
 
+from config.logging import Logger
+
 # from MessageThread import CustomThread
 
 message_list = []
@@ -16,6 +18,7 @@ user = 'user'
 password = os.getenv("RABBITMQ_PASSWORD", "o1mB8moVLo")
 application = os.getenv("APPLICATION", "#application")
 
+logger = Logger().setup_logger(service_name=__name__)
 
 
 def publish_message(data, queue):
@@ -28,7 +31,7 @@ def publish_message(data, queue):
     channel = publish_connection.channel()
     status = channel.queue_declare(queue=queue, durable=True)
     if status.method.message_count == 0:
-        logging.info("queue empty")
+        logger.info("queue empty")
 
     channel.basic_publish(exchange='',
                           routing_key=queue,
@@ -37,5 +40,5 @@ def publish_message(data, queue):
                               delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
                           ))
 
-    print("message delivered", flush=True)
+    logger.info("message delivered", flush=True)
     publish_connection.close()
