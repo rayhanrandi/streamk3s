@@ -1,8 +1,6 @@
 import json
 import os
 import logging
-import Host
-import Kubernetes
 from hurry.filesize import size, iec
 import subprocess
 import requests
@@ -395,7 +393,11 @@ def namespace(application):
 
 def generate_queue(queue, application):
     password = os.getenv("RABBITMQ_PASSWORD", "password")
-    parameters = {"durable": True}
+    # INFO: quorum queues require the rabbitmq deployment to have at least 3 replicas
+    parameters = {
+        "durable": True,
+        "x-queue-type": "quorum"
+    }
     ip = os.getenv("POD_IP", "ip")
     # SOLVED: rabbitmq loadbalancer service expose the 30298 port, forward to 15672
     # SOLVED : can use localhost as ip
@@ -413,7 +415,7 @@ def generate_queue(queue, application):
         + json.dumps(parameters)
         + "'"
     )
-    # curl -u user:xw -X PUT http://localhost:30298/api/queues/axl2/simpleq --data '{"durable":true}'
+    # curl -u user:xw -X PUT http://localhost:30298/api/queues/axl2/simpleq --data '{"durable":true, "x-queue-type": "quorum"}'
     print(str(command))
     subprocess.call([str(command)], shell=True)
 

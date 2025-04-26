@@ -26,7 +26,11 @@ def publish_message(data, queue):
         )
         
         channel = publish_connection.channel()
-        status = channel.queue_declare(queue=queue, durable=True)
+        status = channel.queue_declare(
+            queue=queue, 
+            durable=True,
+            arguments={ "x-queue-type": "quorum"}
+        )
         
         if status.method.message_count == 0:
             logger.info("queue empty")
