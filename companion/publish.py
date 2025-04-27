@@ -29,7 +29,9 @@ def publish_message(data, queue):
         status = channel.queue_declare(
             queue=queue, 
             durable=True,
-            arguments={ "x-queue-type": "quorum"}
+            arguments={ 
+                "x-queue-type": "quorum" 
+            }
         )
         
         if status.method.message_count == 0:
