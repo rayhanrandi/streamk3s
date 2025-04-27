@@ -374,6 +374,7 @@ def namespace(application):
     }
     password = os.getenv("RABBITMQ_PASSWORD", "password")
     ip = os.getenv("POD_IP", "ip")
+    node_port = os.getenv("NODE_PORT", "node_port")
     # SOLVED: rabbitmq loadbalancer service expose the 30298 port, forward to 15672
     # SOLVED : can use localhost as ip
     command = (
@@ -381,7 +382,7 @@ def namespace(application):
         + password
         + " -X PUT "
         + "localhost"
-        + ":30298/api/vhosts/"
+        + f":{node_port}/api/vhosts/"
         + application
     )
     # curl -u user:xw -X PUT http://localhost:30298/api/vhosts/axl2
@@ -401,6 +402,7 @@ def generate_queue(queue, application):
         }
     }
     ip = os.getenv("POD_IP", "ip")
+    node_port = os.getenv("NODE_PORT", "node_port")
     # SOLVED: rabbitmq loadbalancer service expose the 30298 port, forward to 15672
     # SOLVED : can use localhost as ip
     command = (
@@ -408,7 +410,7 @@ def generate_queue(queue, application):
         + password
         + " -X PUT "
         + "localhost"
-        + ":30298/api/queues/"
+        + f":{node_port}/api/queues/"
         + application
         + "/"
         + queue
