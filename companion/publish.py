@@ -22,16 +22,15 @@ def publish_message(data, queue):
             pika.ConnectionParameters(
                 host=rabbit_ip,
                 credentials=credentials,
-                virtual_host=application)
+                virtual_host=application
+            )
         )
         
         channel = publish_connection.channel()
         status = channel.queue_declare(
             queue=queue, 
             durable=True,
-            arguments={ 
-                "x-queue-type": "quorum" 
-            }
+            arguments={ "x-queue-type": "quorum" }
         )
         
         if status.method.message_count == 0:
