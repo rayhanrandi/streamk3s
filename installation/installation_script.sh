@@ -54,6 +54,7 @@ RABBITMQ_USERNAME="user"
 RABBITMQ_PASSWORD=$(kubectl get secret mu-rabbit-rabbitmq --namespace rabbit -o jsonpath='{.data.rabbitmq-password}' | base64 --decode)
 # Create .env file and store the credentials
 pod_ip=$(kubectl get pod mu-rabbit-rabbitmq-0 -n rabbit -o jsonpath='{.status.podIP}')
+node_port=$(kubectl get svc loadbalancer -n rabbit -o jsonpath='{.spec.ports[0].nodePort}')
 cd ..
 cd instancemanager
 echo "RABBITMQ_USERNAME=$RABBITMQ_USERNAME" > .env
@@ -65,6 +66,14 @@ if [ -n "$pod_ip" ]; then
 else
     # If pod IP address is not found, display a message
     echo "Pod IP Address not found for RabbitMQ."
+fi
+if [ -n "$node_port" ]; then
+    # Create .env file and store rabbit node port
+    echo "NODE_PORT=$node_port" >> .env
+    echo "Node Port for RabbitMQ LB found: $node_port"
+else
+    # If node port is not found, display a message
+    echo "Node Port not found for RabbitMQ."
 fi
 cd ..
 cp instancemanager/.env converter_streams
