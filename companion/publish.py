@@ -1,7 +1,7 @@
 import os
 import pika
 
-from config.logging import Logger
+from config.logging import logger
 
 
 message_list = []
@@ -10,8 +10,6 @@ rabbit_ip = os.getenv("RABBIT_IP", "10.100.59.176")
 user = 'user'
 password = os.getenv("RABBITMQ_PASSWORD", "o1mB8moVLo")
 application = os.getenv("APPLICATION", "#application")
-
-logger = Logger().setup_logger(service_name=__name__)
 
 
 def publish_message(data, queue):

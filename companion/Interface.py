@@ -1,4 +1,3 @@
-import logging
 import os
 import json
 import consume
@@ -6,10 +5,10 @@ import flask
 from flask import Flask, jsonify
 import publish
 
-app = Flask(__name__)
-logging.getLogger().setLevel(logging.INFO)
+from config.logging import logger
 
-logging.getLogger().setLevel(logging.INFO)
+app = Flask(__name__)
+
 termination = os.getenv("TERMINATION_QUEUE", "#termination")
 
 
@@ -22,13 +21,12 @@ def post():
     except json.JSONDecodeError as e:
         return jsonify({"error": "Invalid JSON data"}), 400
 
+    queue = os.getenv("OUTPUT_QUEUE", "#queue")
     if json_data.get("status") and termination != "#termination":
-        logging.info(json_string)
-        publish.publish_message(json_string, termination)
-    if json_data.get("status") is None:
-        logging.info(json_string)
-        rabbit_queue = os.getenv("OUTPUT_QUEUE", "#queue")
-        publish.publish_message(json_string, rabbit_queue)
+        queue = termination
+
+    logger.info(json_string)
+    publish.publish_message(json_string, queue)
 
     return jsonify(json_data)
 

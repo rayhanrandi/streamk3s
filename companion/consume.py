@@ -7,8 +7,9 @@ import pika
 import requests
 from requests.auth import HTTPBasicAuth
 
-# from MessageThread import CustomThread
-logging.getLogger().setLevel(logging.INFO)
+from config.logging import logger
+
+
 rabbit_ip = os.getenv("RABBIT_IP", "10.100.59.176")
 user = 'user'
 password = os.getenv("RABBITMQ_PASSWORD", "o1mB8moVLo")
@@ -16,10 +17,6 @@ application = os.getenv("APPLICATION", "#application")
 
 
 def callback(ch, method, properties, body):
-    # thread = CustomThread()
-    # thread.start()
-    # thread.join()
-
     my_json = body.decode('utf8')
     json_format = json.dumps(my_json, indent=4, sort_keys=False)
     pod_ip = os.getenv("MY_POD_IP", "0.0.0.0")
@@ -47,7 +44,7 @@ def consume_message(queue):
     result = channel.basic_consume(queue=queue,
                                    auto_ack=False,
                                    on_message_callback=callback)
-    logging.info(' [*] Waiting for messages.')
+    logger.info(' [*] Waiting for messages.')
     channel.start_consuming()
     channel.stop_consuming()
     return result

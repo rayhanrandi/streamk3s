@@ -57,4 +57,4 @@ class Logger:
         return self._logger
 
 
-logger = Logger().setup_logger("main_executor")
+logger = Logger().setup_logger("companion")
