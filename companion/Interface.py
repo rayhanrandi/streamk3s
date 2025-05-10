@@ -7,7 +7,6 @@ import consume
 import publish
 
 import flask
-import pika
 
 from flask import Flask, jsonify
 
@@ -23,42 +22,6 @@ deadletter_queue: Queue = Queue(maxsize=QUEUE_MAXSIZE)
 queue = os.getenv("OUTPUT_QUEUE", "#queue")
 termination = os.getenv("TERMINATION_QUEUE", "#termination")
 
-
-# class MessageQueue:
-
-#     _APPLICATION = os.getenv("APPLICATION", "#APPLICATION")
-#     _RABBIT_IP = os.getenv("RABBIT_IP", "10.100.59.176")
-#     _USER = 'user'
-#     _PASSWORD = os.getenv("RABBITMQ_PASSWORD", "o1mB8moVLo")
-
-#     def __init__(self) -> None:
-#         """
-#         Initializes a BlockingConnection to RabbitMQ.
-#         """
-#         logger.info('initializing BlockingConnection and BlockingChannel...')
-#         try:
-#             self._credentials = pika.PlainCredentials(self._USER, self._PASSWORD)
-#             self._conn_params = pika.ConnectionParameters(
-#                 host=self._RABBIT_IP,
-#                 credentials=self._credentials,
-#                 virtual_host=self._APPLICATION
-#             )
-#             self._conn = pika.BlockingConnection(self._conn_params)
-#             self._is_connected = Value('i', 1)
-#         except Exception as e:
-#             logger.error(f'error while initializing connection: {str(e)}')
-
-#     @retry(wait=wait_exponential(multiplier=1, min=0, max=3))
-#     def reconnect(self) -> None:
-#         try:
-#             self._conn.close()
-#         except:
-#             pass
-#         self._conn = pika.BlockingConnection(self._conn_params)
-
-#     def get_connection(self) -> pika.BlockingConnection:
-#         return self._conn
-    
 
 @app.route("/post_message", methods=["POST"])
 def post():
