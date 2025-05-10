@@ -13,9 +13,10 @@ sudo apt install libsystemd-dev
 sudo -H pip3 install oyaml
 sudo -H pip3 install hurry.filesize
 sudo -H pip3 install PyYAML
-sudo -H pip3 install flask
+sudo -H pip3 install flask[async]
 sudo -H pip3 install tosca-parser
 sudo -H pip3 install pika
+sudo -H pip3 install tenacity
 sudo -H pip3 install python-dotenv
 sudo -H pip3 install systemd-python
 snap install helm --classic
