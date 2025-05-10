@@ -8,7 +8,7 @@ from tenacity import (
     stop_after_attempt, stop_after_delay, wait_exponential,
 )
 
-from config.logging import logger
+from config.global_logger import logger
 
 
 RABBIT_IP = os.getenv("RABBIT_IP", "10.100.59.176")
@@ -21,9 +21,9 @@ def with_retry_publish(data: str, target_queue: str, deadletter_queue: Queue) ->
     try:
         publish_message(data, target_queue)
     except:
-        logger.warn('failed to publish message. triggering failover...')
+        logger.warn(f'[PID {os.getpid()}] - failed to publish message. triggering failover...')
         deadletter_queue.put(data)
-        logger.info('message put to failover queue')
+        logger.info(f'[publisher PID {os.getpid()}] - message put to failover queue')
 
 
 def publish_failover(deadletter_queue: Queue, target_queue: str) -> None:
@@ -32,10 +32,11 @@ def publish_failover(deadletter_queue: Queue, target_queue: str) -> None:
             data = deadletter_queue.get()
             try:
                 publish_message(data, target_queue)
+                logger.info(f'[publisher PID {os.getpid()}] - DLQ publish success')
             except:
-                logger.warn('failed to publish DLQ message. triggering failover...')
+                logger.warn(f'[publisher PID {os.getpid()}] - failed to publish DLQ message. triggering failover...')
                 deadletter_queue.put(data)
-                logger.info('message put to failover queue')
+                logger.info(f'[publisher PID {os.getpid()}] - message put to failover queue')
 
 
 @retry(
@@ -60,7 +61,7 @@ def publish_message(data: str, target_queue: str):
     )
     
     if status.method.message_count == 0:
-        logger.info("queue empty")
+        logger.info(f"[publisher PID {os.getpid()}] - queue empty")
 
     channel.basic_publish(
         exchange='',
@@ -70,7 +71,6 @@ def publish_message(data: str, target_queue: str):
             delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
         )
     )
-    logger.info("message delivered")
+    logger.info(f'[publisher PID {os.getpid()}] - message delivered')
     
     publish_connection.close()
-    

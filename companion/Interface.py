@@ -11,7 +11,7 @@ import pika
 
 from flask import Flask, jsonify
 
-from config.logging import logger
+from config.global_logger import logger
 
 
 QUEUE_MAXSIZE: int = 10000
@@ -61,35 +61,35 @@ termination = os.getenv("TERMINATION_QUEUE", "#termination")
     
 
 @app.route("/post_message", methods=["POST"])
-async def post():
+def post():
     json_string = flask.request.data.decode("utf-8")
 
     try:
         json_data = json.loads(json_string)
     except json.JSONDecodeError as e:
-        logger.error(f"Failed while decoding JSON data: {e.msg}")
+        logger.error(f"[interface PID {os.getpid()}] - Failed while decoding JSON data: {e.msg}")
         return jsonify({"error": "Invalid JSON data"}), 400
 
     target_queue = queue
     if json_data.get("status") and termination != "#termination":
-        logger.info("Termination message received.")
+        logger.info(f"[interface PID {os.getpid()}] - Termination message received.")
         target_queue = termination
 
     # publish message in child processes
-    logger.info(f'spawning child process to publish message: f{json_string}...')
+    logger.info(f'[interface PID {os.getpid()}] - spawning child process to publish message: f{json_string}...')
     p_publisher = Process(
         target=publish.with_retry_publish,
         args=(json_string, target_queue, deadletter_queue,)
     )
     p_publisher.start()
 
-    logger.info(f'DLQ size: {deadletter_queue.qsize()}')
+    logger.info(f'[interface PID {os.getpid()}] - DLQ size: {deadletter_queue.qsize()}')
     
     return jsonify(json_data)
 
 
 @app.route("/get_message", methods=["GET"])
-async def get():
+def get():
     rabbit_input_queue = os.getenv("INPUT_QUEUE", "queue-1")
     json_data = consume.consume_message(rabbit_input_queue)
     return json_data
