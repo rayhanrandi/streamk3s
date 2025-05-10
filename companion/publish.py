@@ -32,11 +32,11 @@ def publish_failover(deadletter_queue: Queue, target_queue: str) -> None:
             data = deadletter_queue.get()
             try:
                 publish_message(data, target_queue)
-                logger.info(f'[publisher PID {os.getpid()}] - DLQ publish success')
+                logger.info(f'[DLQ publisher PID {os.getpid()}] - DLQ publish success')
             except:
-                logger.warn(f'[publisher PID {os.getpid()}] - failed to publish DLQ message. triggering failover...')
+                logger.warn(f'[DLQ publisher PID {os.getpid()}] - failed to publish DLQ message. triggering failover...')
                 deadletter_queue.put(data)
-                logger.info(f'[publisher PID {os.getpid()}] - message put to failover queue')
+                logger.info(f'[DLQ publisher PID {os.getpid()}] - message put to failover queue')
 
 
 @retry(
@@ -44,6 +44,8 @@ def publish_failover(deadletter_queue: Queue, target_queue: str) -> None:
         stop=(stop_after_attempt(5) | stop_after_delay(15)),
 )
 def publish_message(data: str, target_queue: str):
+    import time
+    time.sleep(10)
     data_bytes = data.encode('utf-8')
     credentials = pika.PlainCredentials(USER, PASSWORD)
     publish_connection = pika.BlockingConnection(
