@@ -9,8 +9,9 @@ COPY ./publish.py ./
 COPY ./Interface.py ./
 COPY ./consume.py ./
 RUN pip3 install pika==1.2.0 \
-    flask \
-    requests
+    flask[async] \
+    requests \
+    tenacity
 ENV RABBIT_IP="#ip"
 ENV TOPIC="#topic"
 ENV RABBITMQ_PASSWORD = "#password"
