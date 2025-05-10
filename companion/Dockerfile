@@ -5,6 +5,7 @@ COPY publish.py .
 
 RUN mkdir /Publish
 WORKDIR /Publish
+COPY ./config/ ./config/
 COPY ./publish.py ./
 COPY ./Interface.py ./
 COPY ./consume.py ./
