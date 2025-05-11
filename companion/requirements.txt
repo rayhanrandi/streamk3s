@@ -1,0 +1,4 @@
+flask[async]==2.0.3
+pika==1.2.0
+requests==2.27.1
+tenacity==8.2.2
