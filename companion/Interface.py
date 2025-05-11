@@ -19,8 +19,8 @@ app = Flask(__name__)
 
 deadletter_queue: Queue = Queue(maxsize=QUEUE_MAXSIZE)
 
-queue = os.getenv("OUTPUT_QUEUE", "#queue")
-termination = os.getenv("TERMINATION_QUEUE", "#termination")
+queue: str = os.getenv("OUTPUT_QUEUE", "#queue")
+termination: str = os.getenv("TERMINATION_QUEUE", "#termination")
 
 
 @app.route("/post_message", methods=["POST"])
